@@ -8,6 +8,7 @@ interface Frame {
     height: number;
     label: string;
     frameId: string;
+    annotationId: string;
 }
 
 type Frames = Frame[];
