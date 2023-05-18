@@ -10,11 +10,10 @@ import useAnnotations from 'hooks/useAnnotations';
 import _ from 'lodash';
 import image from 'mocks/002_RgbMaster_69426.jpg';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import useFrameId from 'hooks/useFrameId';
 
-const floatToPixel = (float: number, factor: number) =>
-    `${Math.floor(float / factor)}px`;
-
-const frameId = '002_RgbMaster_69426';
+const floatToPixel = (float: number, divisor: number) =>
+    `${Math.floor(float / divisor)}px`;
 
 function App() {
     const [selectedGroup, setSelectedGroup] = useState('');
@@ -30,6 +29,7 @@ function App() {
     const [divisorHeight, setDivisorHeight] = React.useState(0);
 
     const data = useAnnotations();
+    const frameId = useFrameId();
     const groups = useMemo(() => _.groupBy(data, 'label'), [data]);
 
     const frames = useMemo(() => {
@@ -46,7 +46,7 @@ function App() {
                 : undefined
         );
         return framesGroupedByImage[frameId];
-    }, [groups, selectedGroup]);
+    }, [groups, selectedGroup, frameId]);
 
     const onResize = useCallback(() => {
         if (imageRef.current) {
@@ -78,12 +78,12 @@ function App() {
                 alignItems="center"
             >
                 <FormControl sx={{ minWidth: 400, margin: '10px 0' }}>
-                    <InputLabel id="demo-simple-select-label">
+                    <InputLabel id="annotation-label">
                         Annotation Label
                     </InputLabel>
                     <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
+                        labelId="annotation-select-label"
+                        id="annotation-select"
                         value={selectedGroup}
                         label="Annotation Label"
                         onChange={event => setSelectedGroup(event.target.value)}
@@ -99,12 +99,12 @@ function App() {
                 </FormControl>
                 <Typography color="red">{errorMessage}</Typography>
             </Box>
-            <Box gap="10px"></Box>
             <Box position="relative" display="grid" height="100%">
                 {frames &&
                     frames.map(item => {
                         return (
                             <Box
+                                data-testid="frame"
                                 key={item.annotationId}
                                 position="absolute"
                                 left={floatToPixel(item.x, divisorWidth)}
